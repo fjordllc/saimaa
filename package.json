@@ -1,0 +1,23 @@
+{
+  "name": "saimaa",
+  "version": "0.0.3",
+  "description": "Heavily customized wysiwyg editor.",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start --single-run"
+  },
+  "author": "Masaki Komagata",
+  "license": "ISC",
+  "devDependencies": {
+    "coffee-loader": "^0.7.3",
+    "jasmine": "^2.7.0",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coffee-preprocessor": "^1.0.1",
+    "karma-html2js-preprocessor": "^1.1.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-mocha-reporter": "^2.2.3",
+    "karma-webpack": "^2.0.4",
+    "webpack": "^3.4.1"
+  }
+}
