@@ -1,3 +1,5 @@
+SaimaaUtil = require "./saimaa_util"
+
 class SaimaaDOM
   constructor: (@editor) ->
 
@@ -75,7 +77,11 @@ class SaimaaDOM
     @append bq
 
   formatBlock: (tag) ->
-
+    console.log SaimaaUtil
+    if SaimaaUtil.ie()
+      document.execCommand("formatBlock", false, "<#{tag}>")
+    else
+      document.execCommand("formatBlock", false, tag)
 
   moveCaret: (node) ->
     range = document.createRange()

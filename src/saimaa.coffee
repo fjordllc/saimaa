@@ -11,19 +11,23 @@ class Saimaa
 
   initEditor: ->
     @editor = document.createElement "div"
-    @editor.contenteditable = true
+    @editor.contentEditable = true
     @editor.className = @source.className
 
     @source.parentNode.insertBefore(@editor, @source)
     @source.style.display = "none"
 
   onKeyDown: (event) ->
-    "foo"
+    if @editor.children.length == 0
+      @dom.formatBlock("p")
+    else
+      if event.keyCode == 13
+#       event.preventDefault()
+#       @newLine()
+        "aaa"
+
 
   onKeyUp: (event) ->
     "bar"
-
-  foo: ->
-    console.log "foo!!!"
 
 module.exports = Saimaa

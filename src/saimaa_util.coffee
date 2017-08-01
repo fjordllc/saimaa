@@ -1,10 +1,8 @@
-class SaimaaUtil
-  @ie = ->
+module.exports =
+  ie: ->
     ua = window.navigator.userAgent
-    ua.match(/MSIE/) or ua.match(/Trident/)
-    if ie then true else false
+    result = ua.match(/MSIE/) or ua.match(/Trident/)
+    !!result
 
-  @ie11: ->
+  ie11: ->
     document.documentMode == 11
-
-module.exports = SaimaaUtil
