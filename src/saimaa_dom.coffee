@@ -1,13 +1,8 @@
+h = require "h"
 SaimaaUtil = require "./saimaa_util"
 
 class SaimaaDOM
   constructor: (@editor) ->
-
-  h: (tag, child = null) ->
-    node = document.createElement tag
-    if child
-      node.appendChild child
-    node
 
   html: ->
     @editor.innerHTML
@@ -27,8 +22,8 @@ class SaimaaDOM
     @moveCaret node
 
   appendP: ->
-    p = @h "p"
-    br = @h "br"
+    p = h "p"
+    br = h "br"
     p.appendChild br
     @append p
 
@@ -38,7 +33,7 @@ class SaimaaDOM
     @append li
 
   changeTag: (tag) ->
-    newNode = @h tag
+    newNode = h tag
     oldCaretNode = @caretNode()
     for childNode in oldCaretNode.childNodes
       newNode.appendChild childNode
@@ -48,9 +43,9 @@ class SaimaaDOM
 
   changeList: (tag) ->
     oldCaretNode = @caretNode()
-    list = @h tag
-    li = @h "li"
-    br = @h "br"
+    list = h tag
+    li = h "li"
+    br = h "br"
     li.appendChild br
     list.appendChild li
     @append list
@@ -71,7 +66,7 @@ class SaimaaDOM
   changeBlockquote: ->
     childNodes = @caretNode().childNodes
     lastNode = childNodes
-    bq = @h "blockquote"
+    bq = h "blockquote"
     for node in childNodes
       bq.appendChild node
     @append bq
