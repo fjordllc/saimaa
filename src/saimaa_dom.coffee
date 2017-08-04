@@ -17,8 +17,21 @@ class SaimaaDOM
     #console.log "return node", result
     result
 
+  add: (node) ->
+    selection = window.getSelection()
+    if selection.rangeCount > 0
+      range = selection.getRangeAt(0)
+      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+      range.insertNode node
+      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+      range.setStartAfter node
+      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+
   append: (node) ->
-    @editor.insertBefore(node, @caretNode().nextSibling)
+    if @editor == @caretNode()
+      @editor.appendChild node
+    else
+      @editor.insertBefore(node, @caretNode().nextSibling)
     @moveCaret node
 
   appendP: ->
@@ -50,8 +63,10 @@ class SaimaaDOM
     list.appendChild li
     @append list
     @moveCaret br
-    @editor.removeChild oldCaretNode
-    #console.log "after caret", @caretNode(), "parentNode", @caretNode().parentNode
+
+    if @editor != oldCaretNode
+      @editor.removeChild oldCaretNode
+      #console.log "after caret", @caretNode(), "parentNode", @caretNode().parentNode
 
   changeUl: -> @changeList "ul"
 
@@ -72,11 +87,21 @@ class SaimaaDOM
     @append bq
 
   formatBlock: (tag) ->
-    console.log SaimaaUtil
     if SaimaaUtil.ie()
-      document.execCommand("formatBlock", false, "<#{tag}>")
+      t = "<#{tag}>"
     else
-      document.execCommand("formatBlock", false, tag)
+      t = tag
+
+    document.execCommand("formatBlock", false, t)
+
+  inLi: ->
+    @caretNode().tagName.toLowerCase() == "li"
+
+  inP: ->
+    @caretNode().tagName.toLowerCase() == "p"
+
+  inTitle: ->
+    @caretNode().className.toLowerCase() == "title"
 
   moveCaret: (node) ->
     range = document.createRange()
