@@ -3,6 +3,7 @@ SaimaaUtil = require "./saimaa_util"
 
 class SaimaaDOM
   constructor: (@editor) ->
+    @lastNode = null
 
   html: ->
     @editor.innerHTML
@@ -20,12 +21,23 @@ class SaimaaDOM
   add: (node) ->
     selection = window.getSelection()
     if selection.rangeCount > 0
-      range = selection.getRangeAt(0)
+      range = selection.getRangeAt 0
       console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
       range.insertNode node
-      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
       range.setStartAfter node
-      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+      range.collapse true
+      #console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+
+  addBr: ->
+    selection = window.getSelection()
+    if selection.rangeCount > 0
+      range = selection.getRangeAt 0
+      br = h "br"
+      br2 = h "br"
+      range.insertNode br
+      range.insertNode br2
+      range.setStartAfter br2
+      range.collapse true
 
   append: (node) ->
     if @editor == @caretNode()
@@ -55,6 +67,8 @@ class SaimaaDOM
     @editor.removeChild oldCaretNode
 
   changeList: (tag) ->
+    @moveCaret @lastNode if @lastNode
+
     oldCaretNode = @caretNode()
     list = h tag
     li = h "li"
@@ -79,6 +93,8 @@ class SaimaaDOM
   changeH4: -> @changeTag "h4"
 
   changeBlockquote: ->
+    @moveCaret @lastNode if @lastNode
+
     childNodes = @caretNode().childNodes
     lastNode = childNodes
     bq = h "blockquote"
@@ -86,13 +102,24 @@ class SaimaaDOM
       bq.appendChild node
     @append bq
 
+  changeTitle: ->
+    @editor.childNodes[0].className = "title"
+
   formatBlock: (tag) ->
+    @moveCaret @lastNode if @lastNode
+
     if SaimaaUtil.ie()
       t = "<#{tag}>"
     else
       t = tag
 
     document.execCommand("formatBlock", false, t)
+
+  afterDoubleBr: ->
+    @caretNode().normalize()
+    range = window.getSelection().getRangeAt(0)
+    console.log "start", range.startContainer, range.startOffset
+    false
 
   inLi: ->
     @caretNode().tagName.toLowerCase() == "li"
@@ -110,5 +137,9 @@ class SaimaaDOM
     range.collapse true
     selection.removeAllRanges()
     selection.addRange range
+
+  saveLastNode: ->
+    if @editor != @caretNode() and @editor.contains @caretNode()
+      @lastNode = @caretNode()
 
 module.exports = SaimaaDOM

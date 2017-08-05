@@ -76,7 +76,7 @@ describe "SaimaaDOM", ->
 
   it "inLi", ->
     expect(@saimaa.inLi()).toBe(false)
-    @saimaa.append(document.createElement("li"))
+    @saimaa.append document.createElement("li")
     assert @saimaa.inLi()
 
   it "inP", ->
@@ -85,6 +85,11 @@ describe "SaimaaDOM", ->
 
   it "inTitle", ->
     p = document.createElement("p")
-    p.className = "titg stle"
+    p.className = "title"
     @saimaa.append(p)
     assert @saimaa.inTitle()
+
+  it "afterDoubleBr", ->
+    @saimaa.addBr()
+    console.log @saimaa.html()
+    assert @saimaa.afterDoubleBr()
