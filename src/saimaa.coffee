@@ -8,6 +8,13 @@ class Saimaa
     @initEditor()
     @dom = new SaimaaDOM @editor
     @ui = new SaimaaUI @editor
+    @ui.h2.addEventListener "click", (event) => @h2 event
+    @ui.h3.addEventListener "click", (event) => @h3 event
+    @ui.h4.addEventListener "click", (event) => @h4 event
+    @ui.ol.addEventListener "click", (event) => @ol event
+    @ui.ul.addEventListener "click", (event) => @ul event
+    @ui.bq.addEventListener "click", (event) => @bq event
+    @ui.clear.addEventListener "click", (event) => @clear event
 
     @editor.addEventListener "keydown", (event) => @onKeyDown event
     @editor.addEventListener "keyup", (event) => @onKeyUp event
@@ -21,9 +28,15 @@ class Saimaa
     @source.parentNode.insertBefore @editor, @source
     @source.style.display = "none"
 
-  h2: (event) -> @dom.formatBlock "h2"
-  h3: (event) -> @dom.formatBlock "h3"
-  h4: (event) -> @dom.formatBlock "h4"
+  h2: (event) ->
+    @dom.formatBlock "h2"
+
+  h3: (event) ->
+    @dom.formatBlock "h3"
+
+  h4: (event) ->
+    @dom.formatBlock "h4"
+
   ol: (event) -> @dom.changeOl()
   ul: (event) -> @dom.changeUl()
   bq: (event) -> @dom.changeBlockquote()
@@ -35,9 +48,18 @@ class Saimaa
 
   newLine: ->
     if @dom.inP() and !@dom.inTitle()
-      @dom.addBr()
+      if @dom.tailBr()
+        @dom.appendP()
+      else
+        @dom.addBr()
     else
-      @dom.appendP()
+      if @dom.inLi()
+        if @dom.inBlankLi()
+          @dom.breakLi()
+        else
+          @dom.appendLi()
+      else
+        @dom.appendP()
 
   onClick: (event) ->
     console.log event.target
@@ -52,16 +74,7 @@ class Saimaa
       @ui.blockUI.style.top = "#{parseInt(event.target.offsetTop - height)}px"
       @ui.blockUI.style.left = "#{parseInt(event.target.offsetLeft)}px"
 
-      @ui.h2.addEventListener "click", (event) => @h2 event
-      @ui.h3.addEventListener "click", (event) => @h3 event
-      @ui.h4.addEventListener "click", (event) => @h4 event
-      @ui.ol.addEventListener "click", (event) => @ol event
-      @ui.ul.addEventListener "click", (event) => @ul event
-      @ui.bq.addEventListener "click", (event) => @bq event
-      @ui.clear.addEventListener "click", (event) => @clear event
-
   onKeyDown: (event) ->
-
     if @editor.children.length == 0
       @dom.formatBlock("p")
       @dom.changeTitle()
@@ -69,8 +82,6 @@ class Saimaa
     if event.keyCode == 13
      event.preventDefault()
      @newLine()
-
-    @dom.afterDoubleBr()
 
     @dom.saveLastNode()
 

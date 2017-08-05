@@ -11,6 +11,11 @@ module.exports = function (config) {
       "test/**/*_test.coffee": ["webpack"],
       "html/**/*.html": "html2js"
     },
+    coffeePreprocessor: {
+      options: {
+        sourceMap: false
+      }
+    },
     webpack: {
       entry: {
         app: __dirname + '/src/saimaa.coffee'

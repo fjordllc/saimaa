@@ -1,3 +1,4 @@
+assert = require "assert"
 Saimaa = require "../src/saimaa"
 
 describe "Saimaa", ->
@@ -10,5 +11,4 @@ describe "Saimaa", ->
   it "initialize", ->
     div = document.querySelector ".is-wysiwyg"
     div.innerHTML = "<p><br></p>"
-    expect @saimaa.dom.html()
-      .toEqual "<p><br></p>"
+    assert.equal @saimaa.dom.html(), "<p><br></p>"

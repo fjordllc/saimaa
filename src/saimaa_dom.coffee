@@ -9,20 +9,18 @@ class SaimaaDOM
     @editor.innerHTML
 
   caretNode: ->
-    node = window.getSelection().anchorNode
-    #console.log "node:", node, "nodeType", node.nodeType, Node.TEXT_NODE, "tagName", node.tagName, "parent", node.parentNode
-    if node? and node.nodeType == Node.TEXT_NODE or (node.tagName? and node.tagName == "BR")
-      result = node.parentNode
+    anchorNode = window.getSelection().anchorNode
+    if anchorNode.nodeType == Node.TEXT_NODE
+      result = anchorNode.parentNode
     else
-      result = node
-    #console.log "return node", result
+      result = anchorNode
     result
 
   add: (node) ->
     selection = window.getSelection()
     if selection.rangeCount > 0
       range = selection.getRangeAt 0
-      console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
+      #console.log "anchor", selection.anchorNode, "start", range.startContainer, range.startOffset, "end", range.endContainer, range.endOffset
       range.insertNode node
       range.setStartAfter node
       range.collapse true
@@ -36,26 +34,34 @@ class SaimaaDOM
       br2 = h "br"
       range.insertNode br
       range.insertNode br2
-      range.setStartAfter br2
+      range.setStartAfter br
       range.collapse true
 
-  append: (node) ->
+  append: (node, caretNode = null) ->
+    #@removeCaretLeft() if @caretLeft() and @caretLeft.tagName.toLowerCase() == "br"
+
+    for n in [1..2]
+      @removeCaretLeft() if @caretLeftIsBr()
+
+    #rightNodes = @removeCaretRightAll() if @caretRightAll()
+
+    oldCaretNode = @caretNode()
     if @editor == @caretNode()
       @editor.appendChild node
     else
-      @editor.insertBefore(node, @caretNode().nextSibling)
-    @moveCaret node
+      @caretNode().parentNode.insertBefore(node, @caretNode().nextSibling)
+    if caretNode
+      @moveCaret caretNode
 
   appendP: ->
-    p = h "p"
     br = h "br"
-    p.appendChild br
-    @append p
+    p = h "p", br
+    @append p, br
 
   appendLi: ->
-    li = document.createElement "li"
-    li.appendChild document.createElement "br"
-    @append li
+    br = h "br"
+    li = h "li", br
+    @append li, br
 
   changeTag: (tag) ->
     newNode = h tag
@@ -67,30 +73,36 @@ class SaimaaDOM
     @editor.removeChild oldCaretNode
 
   changeList: (tag) ->
+    @editor.focus()
+    oldCaret = @caretNode()
     @moveCaret @lastNode if @lastNode
 
-    oldCaretNode = @caretNode()
-    list = h tag
+
+    ul = h tag
     li = h "li"
     br = h "br"
     li.appendChild br
-    list.appendChild li
-    @append list
-    @moveCaret br
+    ul.appendChild li
 
-    if @editor != oldCaretNode
-      @editor.removeChild oldCaretNode
-      #console.log "after caret", @caretNode(), "parentNode", @caretNode().parentNode
+    console.log "oldCaret", oldCaret, "@caretNode", @caretNode()
+
+    @append ul, br
+
+    console.log "oldCaret", oldCaret, "@caretNode", @caretNode()
+
+    if @editor != oldCaret
+      @editor.removeChild oldCaret
+
 
   changeUl: -> @changeList "ul"
 
   changeOl: -> @changeList "ol"
 
-  changeH2: -> @changeTag "h2"
+  changeH2: -> @formatBlock "h2"
 
-  changeH3: -> @changeTag "h3"
+  changeH3: -> @formatBlock "h3"
 
-  changeH4: -> @changeTag "h4"
+  changeH4: -> @formatBlock "h4"
 
   changeBlockquote: ->
     @moveCaret @lastNode if @lastNode
@@ -114,15 +126,26 @@ class SaimaaDOM
       t = tag
 
     document.execCommand("formatBlock", false, t)
+    @saveLastNode()
 
-  afterDoubleBr: ->
+  tailBr: ->
     @caretNode().normalize()
     range = window.getSelection().getRangeAt(0)
-    console.log "start", range.startContainer, range.startOffset
-    false
+    startContainer = range.startContainer
+    if startContainer.nodeType == Node.ELEMENT_NODE and startContainer.childNodes.length > 0
+      childNodes = startContainer.childNodes
+      lastNode = childNodes[range.startOffset - 1]
+
+      if @isTag(lastNode, "br")
+        return true
+    return false
 
   inLi: ->
     @caretNode().tagName.toLowerCase() == "li"
+
+  inBlankLi: ->
+    c = @caretNode()
+    c.tagName.toLowerCase() == "li" and c.childNodes.length == 1 and @isTag(c.firstChild, "br")
 
   inP: ->
     @caretNode().tagName.toLowerCase() == "p"
@@ -130,16 +153,82 @@ class SaimaaDOM
   inTitle: ->
     @caretNode().className.toLowerCase() == "title"
 
+  breakLi: ->
+    br = h "br"
+    p = h "p"
+    p.appendChild br
+
+    oldCaretNode = @caretNode()
+    ul = oldCaretNode.parentNode
+    ul.parentNode.insertBefore(p, oldCaretNode.nextSibling)
+    @moveCaret br
+
+    ul.removeChild oldCaretNode
+
   moveCaret: (node) ->
-    range = document.createRange()
-    selection = window.getSelection()
-    range.setStart node, 0
-    range.collapse true
-    selection.removeAllRanges()
-    selection.addRange range
+    window.getSelection().getRangeAt(0).setStartAfter node
 
   saveLastNode: ->
     if @editor != @caretNode() and @editor.contains @caretNode()
       @lastNode = @caretNode()
+
+  isTag: (node, tagName) ->
+    node.nodeType == Node.ELEMENT_NODE and node.tagName.toLowerCase() == tagName
+
+  removeCaretLeft: ->
+    @caretNode().removeChild @caretLeft()
+
+  caretLeft: ->
+    oldCaret = @caretNode()
+    oldCaret.normalize()
+    range = window.getSelection().getRangeAt(0)
+    startContainer = range.startContainer
+    if startContainer.nodeType == Node.ELEMENT_NODE and startContainer.childNodes.length > 0
+      childNodes = startContainer.childNodes
+      leftNode = childNodes[range.startOffset - 1]
+      return leftNode
+    return null
+
+  caretLeftIsBr: ->
+    caretLeft = @caretLeft()
+    caretLeft and caretLeft.nodeType == Node.ELEMENT_NODE and caretLeft.tagName.toLowerCase() == "br"
+
+  caretRightAll: ->
+    oldCaret = @caretNode()
+    oldCaret.normalize()
+    range = window.getSelection().getRangeAt(0)
+    startContainer = range.startContainer
+    if startContainer.nodeType == Node.ELEMENT_NODE and startContainer.childNodes.length > 0
+      childNodes = startContainer.childNodes
+      rightNodes = []
+      n = range.startOffset + 1
+      #console.log "n", n, "childNodes.length", childNodes.length, "childNodes", childNodes, "startOffset", range.startOffset
+      length = childNodes.length
+      while n < length
+        #console.log "n", n, "childNodes[n]", childNodes[n]
+        rightNodes.push childNodes[n]
+        n++
+
+      return rightNodes
+    return null
+
+  removeCaretRightAll: ->
+    oldCaret = @caretNode()
+    oldCaret.normalize()
+    range = window.getSelection().getRangeAt(0)
+    startContainer = range.startContainer
+    if startContainer.nodeType == Node.ELEMENT_NODE and startContainer.childNodes.length > 0
+      childNodes = startContainer.childNodes
+      rightNodes = []
+      offset = range.startOffset + 1
+      n = childNodes.length - 1
+      #console.log "n", n, "childNodes.length", childNodes.length, "childNodes", childNodes, "startOffset", range.startOffset
+      while n >= offset
+        #console.log "n", n, "childNodes[n]", childNodes[n]
+        rightNodes.unshift startContainer.removeChild(childNodes[n])
+        n--
+
+      return rightNodes
+    return null
 
 module.exports = SaimaaDOM

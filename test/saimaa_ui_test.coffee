@@ -1,3 +1,4 @@
+assert = require "assert"
 SaimaaUI = require "../src/saimaa_ui"
 
 describe "SaimaaUI", ->
@@ -8,4 +9,4 @@ describe "SaimaaUI", ->
     @editor.focus()
 
   it "initialize", ->
-    expect(true).toBe(true)
+    assert true
