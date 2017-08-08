@@ -1,5 +1,4 @@
 h = require "h"
-SaimaaUtil = require "./saimaa_util"
 SaimaaDOM = require "./saimaa_dom"
 SaimaaUI = require "./saimaa_ui"
 

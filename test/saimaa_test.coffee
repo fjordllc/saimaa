@@ -11,4 +11,4 @@ describe "Saimaa", ->
   it "initialize", ->
     div = document.querySelector ".is-wysiwyg"
     div.innerHTML = "<p><br></p>"
-    assert.equal @saimaa.dom.html(), "<p><br></p>"
+    assert.equal @saimaa.editor.innerHTML, "<p><br></p>"

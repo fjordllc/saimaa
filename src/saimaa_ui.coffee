@@ -6,7 +6,7 @@ class SaimaaUI
     @createSelectUI()
 
   createBlockUI: ->
-    @blockUI = h "div.saimaa-block-ui", { style: "display: block" }
+    @blockUI = h "div.saimaa-block-ui", { style: "display: none" }
 
     @h2 = h "div.saimaa-block-ui__action.is-h2", "H2"
     @blockUI.appendChild @h2
@@ -32,7 +32,7 @@ class SaimaaUI
     @editor.parentNode.insertBefore(@blockUI, @editor.nextSibling)
 
   createSelectUI: ->
-    @selectUI = h "div.saimaa-select-ui", { style: "display: block" }
+    @selectUI = h "div.saimaa-select-ui", { style: "display: none" }
     @editor.parentNode.insertBefore(@selectUI, @editor.nextSibling)
 
 module.exports = SaimaaUI

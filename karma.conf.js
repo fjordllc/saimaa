@@ -13,7 +13,7 @@ module.exports = function (config) {
     },
     coffeePreprocessor: {
       options: {
-        sourceMap: false
+        sourceMap: true
       }
     },
     webpack: {

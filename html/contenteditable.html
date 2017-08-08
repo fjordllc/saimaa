@@ -3,9 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>Test</title>
+  <style>
+    [contenteditable] {
+      border: 1px solid black;
+      height: 300px;
+    }
+
+    #source {
+      border: 1px solid black;
+      height: 300px;
+    }
+  </style>
 </head>
 <body>
 <div class="is-wysiwyg" contenteditable="true"></div>
+<div id="source"></div>
 <script src="../index.js"></script>
 </body>
 </html>
