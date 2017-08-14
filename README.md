@@ -1,17 +1,17 @@
-# Saimaa
+#textarea-caret-util
 
-Heavily customized wysiwyg editor.
+Utilities for caret in textarea.
 
 ## Usage
 
 ```
-$ npm install -D saimaa
+$ npm install -D textarea-caret-util
 ```
 
 ```
-var Saimaa = require("saimaa");
-var textarea = document.querySelector("#editor");
-new Saimaa(textarea);
+var util = require("saimaa");
+var textarea = document.querySelector("textarea");
+util.insert(textarea);
 ```
 
 ## Testing

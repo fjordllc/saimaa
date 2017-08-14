@@ -1,30 +1,24 @@
 {
-  "name": "saimaa",
-  "version": "0.0.5",
-  "description": "Heavily customized wysiwyg editor.",
-  "main": "lib/saimaa.js",
+  "name": "textarea-caret-util",
+  "version": "0.0.1",
+  "description": "Utilities for caret in textarea.",
+  "main": "index.js",
   "scripts": {
-    "test": "karma start --single-run",
-    "build": "coffee -o lib -c src",
-    "watch": "coffee -o lib -w src "
+    "test": "karma start --single-run"
   },
   "author": "Masaki Komagata",
   "license": "ISC",
   "devDependencies": {
-    "coffee-loader": "^0.7.3",
     "jasmine": "^2.7.0",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-coffee-preprocessor": "^1.0.1",
     "karma-html2js-preprocessor": "^1.1.0",
     "karma-jasmine": "^1.1.0",
     "karma-mocha-reporter": "^2.2.3",
     "karma-webpack": "^2.0.4",
-    "selection-range": "^1.1.0",
     "webpack": "^3.4.1"
   },
   "dependencies": {
-    "coffeescript": "^1.12.7",
     "h": "^0.1.0"
   }
 }
